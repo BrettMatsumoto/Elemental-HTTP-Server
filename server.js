@@ -2,6 +2,7 @@
 
 const http = require('http');
 const fs = require('fs');
+const qs = require('querystring');
 
 const server = http.createServer((req, res) => {
   if (req.method === 'GET') {
@@ -44,6 +45,92 @@ const server = http.createServer((req, res) => {
         }
         return res.end(data);
       });
+    }
+  }
+  if (req.method === 'POST') {
+    if (req.url === '/elements') {
+      let totalData = '';
+      req.on('data', (data) => {
+        totalData += data;
+      });
+      req.on('end', () => {
+        const parsedData = qs.parse(totalData);
+        let additionalElements = [];
+        additionalElements.push([parsedData]);
+        const template = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>${parsedData.elementName}</title>
+</head>
+<body>
+  <div>${parsedData.elementName}</div>
+  <div>${parsedData.elementSymbol}</div>
+  <div>${parsedData.elementAtomicNumber}</div>
+  <div>${parsedData.elementDescription}</div>
+</body>
+</html>`;
+        fs.writeFile(`/public/${parsedData.elementName}.html`, template, 'utf8', (err) => {
+          if (err) {
+            throw err;
+          }
+        });
+        fs.readdir('./public', (err, files) => {
+          const knownFiles = files.filter(
+            (file) => file !== '.keep' && file !== '.404' && file !== 'css' && file !== 'index.html',
+          );
+          let tags = '';
+          let lowerCase = '';
+          let standardCase = '';
+          let subString = '';
+          for (let newElement = 0; newElement < knownFiles.length; newElement++) {
+            lowerCase = knownFiles[newElement].toLowerCase();
+            standardCase = knownFiles[newElement].charAt(0).toUpperCase() + knownFiles[newElement].slice(1);
+            subString = knownFiles[newElement].indexOf('.');
+            tags += `
+            <li>
+              <a href="${lowerCase}">${standardCase.substring(0, subString)} </a>
+            <li>
+            `;
+          }
+        });
+        let reWrittenHTML = `
+<!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>The Elements</title>
+    <link rel="stylesheet" href="/css/styles.css">
+  </head>
+  <body>
+    <h1>The Elements</h1>
+    <h2>These are all the known elements.</h2>
+    <h3>These are ${knownFiles.length}</h3>
+    <ol>
+    </ol>
+    <li>
+    <a href="/hydrogen.html">Hydrogen</a>
+    </li>
+    <li>
+    <a href="/helium.html">Helium</a>
+    </li>
+    </ol>
+    ${tags}
+  </body>
+  </html>`;
+        fs.writeFile(`public/index.hmtl`, reWrittenHTML, 'utf8', (err) => {
+          if (err) {
+            return console.log(err);
+          }
+        });
+      });
+      res.writeHead(200, {
+        'Content-Type' : 'application/json',
+      });
+      res.end(`{"success" : true}`);
     }
   }
 });
