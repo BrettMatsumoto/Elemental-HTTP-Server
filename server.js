@@ -176,5 +176,29 @@ const server = http.createServer((req, res) => {
       });
     });
   }
+  if(req.method === 'DELETE') {
+    let totalData = '';
+    req.on('data', (data) => {
+      totalData += data;
+    });
+    req.on('end', () => {
+      const parsedData = qs.parse(totalData);
+
+      fs.unlink(`./public/${parsedData.elementName}.html`, (err) => {
+        if (err) throw err
+      })
+      if (!(`./public/${parsedData.elementName}.html`)) {
+        res.writeHead(500, {
+          'Content-Type' : 'application/json',
+        });
+        res.end(`{"error" : resource ${parsedData.elementName} does not exist}`);
+      } else {
+        res.writeHead(200, {
+          'Content-Type' : 'application/json',
+        });
+        res.end(`{sucess} : true`)
+      }
+    })
+  }
 });
 server.listen(8080);
