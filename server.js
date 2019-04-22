@@ -38,7 +38,7 @@ const server = http.createServer((req, res) => {
         return res.end(data);
       });
     }
-    if (req.url === '/404.html') {
+    else {
       fs.readFile('./public/404.html', 'utf8', (err, data) => {
         if (err) {
           throw err;
