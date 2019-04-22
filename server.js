@@ -55,10 +55,7 @@ const server = http.createServer((req, res) => {
       });
       req.on('end', () => {
         const parsedData = qs.parse(totalData);
-        let additionalElements = [];
-        additionalElements.push([parsedData]);
-        const template = `
-<!DOCTYPE html>
+        const template = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -73,7 +70,7 @@ const server = http.createServer((req, res) => {
   <div>${parsedData.elementDescription}</div>
 </body>
 </html>`;
-        fs.writeFile(`/public/${parsedData.elementName}.html`, template, 'utf8', (err) => {
+        fs.writeFile(`./public/${parsedData.elementName}.html`, template, 'utf8', (err) => {
           if (err) {
             throw err;
           }
@@ -82,7 +79,7 @@ const server = http.createServer((req, res) => {
           const knownFiles = files.filter(
             (file) => file !== '.keep' && file !== '.404' && file !== 'css' && file !== 'index.html',
           );
-          let tags = '';
+          let tags;
           let lowerCase = '';
           let standardCase = '';
           let subString = '';
@@ -96,39 +93,39 @@ const server = http.createServer((req, res) => {
             <li>
             `;
           }
-        });
-        let reWrittenHTML = `
-<!DOCTYPE html>
-  <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <title>The Elements</title>
-    <link rel="stylesheet" href="/css/styles.css">
-  </head>
-  <body>
-    <h1>The Elements</h1>
-    <h2>These are all the known elements.</h2>
-    <h3>These are ${knownFiles.length}</h3>
-    <ol>
-    </ol>
-    <li>
-    <a href="/hydrogen.html">Hydrogen</a>
-    </li>
-    <li>
-    <a href="/helium.html">Helium</a>
-    </li>
-    </ol>
-    ${tags}
-  </body>
-  </html>`;
-        fs.writeFile(`public/index.hmtl`, reWrittenHTML, 'utf8', (err) => {
-          if (err) {
-            return console.log(err);
-          }
+          let reWrittenHTML = `
+  <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <title>The Elements</title>
+      <link rel="stylesheet" href="/css/styles.css">
+    </head>
+    <body>
+      <h1>The Elements</h1>
+      <h2>These are all the known elements.</h2>
+      <h3>These are ${knownFiles.length} elements</h3>
+      <ol>
+      </ol>
+      <li>
+      <a href="/hydrogen.html">Hydrogen</a>
+      </li>
+      <li>
+      <a href="/helium.html">Helium</a>
+      </li>
+      </ol>
+      ${tags}
+    </body>
+    </html>`;
+          fs.writeFile(`public/index.html`, reWrittenHTML, 'utf8', (err) => {
+            if (err) {
+              return console.log(err);
+            }
+          });
         });
       });
       res.writeHead(200, {
-        'Content-Type' : 'application/json',
+        'Content-Type': 'application/json',
       });
       res.end(`{"success" : true}`);
     }
