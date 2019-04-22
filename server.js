@@ -130,5 +130,51 @@ const server = http.createServer((req, res) => {
       res.end(`{"success" : true}`);
     }
   }
+  if (req.method === 'PUT') {
+    let totalData = '';
+    req.on('data', (data) => {
+      totalData += data;
+    });
+    req.on('end', () => {
+      const parsedData = qs.parse(totalData);
+
+      fs.readdir('./public', (err, files) => {
+        const knownFiles = files.filter(
+          (file) => file !== '.keep' && file !== '.404' && file !== 'css' && file !== 'index.html',
+        );
+        if (!knownFiles.includes(`${parsedData.elementName}.html`)) {
+          res.writeHead(500, {
+            'Content-Type': 'application/json',
+          });
+          res.end(`{"error"} : ${parsedData.elementName}.html was not found.`);
+        } else {
+          const template = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>${parsedData.elementName}</title>
+</head>
+<body>
+  <div>${parsedData.elementName}</div>
+  <div>${parsedData.elementSymbol}</div>
+  <div>${parsedData.elementAtomicNumber}</div>
+  <div>${parsedData.elementDescription}</div>
+</body>
+</html>`;
+          fs.writeFile(`./public/${parsedData.elementName}.html`, template, 'utf8', (err) => {
+            if (err) {
+              throw err;
+            }
+          });
+          res.writeHead(200, {
+            'Content-Type': 'application/json',
+          });
+          res.end(`{sucess} : true`)
+        }
+      });
+    });
+  }
 });
 server.listen(8080);
