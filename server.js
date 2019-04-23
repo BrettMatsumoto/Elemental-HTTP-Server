@@ -37,8 +37,7 @@ const server = http.createServer((req, res) => {
         }
         return res.end(data);
       });
-    }
-    else {
+    } else {
       fs.readFile('./public/404.html', 'utf8', (err, data) => {
         if (err) {
           throw err;
@@ -171,12 +170,12 @@ const server = http.createServer((req, res) => {
           res.writeHead(200, {
             'Content-Type': 'application/json',
           });
-          res.end(`{sucess} : true`)
+          res.end(`{sucess} : true`);
         }
       });
     });
   }
-  if(req.method === 'DELETE') {
+  if (req.method === 'DELETE') {
     let totalData = '';
     req.on('data', (data) => {
       totalData += data;
@@ -185,20 +184,20 @@ const server = http.createServer((req, res) => {
       const parsedData = qs.parse(totalData);
 
       fs.unlink(`./public/${parsedData.elementName}.html`, (err) => {
-        if (err) throw err
-      })
-      if (!(`./public/${parsedData.elementName}.html`)) {
+        if (err) throw err;
+      });
+      if (!`./public/${parsedData.elementName}.html`) {
         res.writeHead(500, {
-          'Content-Type' : 'application/json',
+          'Content-Type': 'application/json',
         });
         res.end(`{"error" : resource ${parsedData.elementName} does not exist}`);
       } else {
         res.writeHead(200, {
-          'Content-Type' : 'application/json',
+          'Content-Type': 'application/json',
         });
-        res.end(`{sucess} : true`)
+        res.end(`{sucess} : true`);
       }
-    })
+    });
   }
 });
 server.listen(8080);
