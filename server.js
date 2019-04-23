@@ -92,7 +92,7 @@ const server = http.createServer((req, res) => {
           const knownFiles = files.filter(
             (file) => file !== '.keep' && file !== '.404' && file !== 'css' && file !== 'index.html',
           );
-          let tags;
+          let tags = '';
           let lowerCase = '';
           let standardCase = '';
           let subString = '';
@@ -121,15 +121,8 @@ const server = http.createServer((req, res) => {
       <h2>These are all the known elements.</h2>
       <h3>These are ${knownFiles.length} elements</h3>
       <ol>
-      </ol>
-      <li>
-      <a href="/hydrogen.html">Hydrogen</a>
-      </li>
-      <li>
-      <a href="/helium.html">Helium</a>
-      </li>
-      </ol>
       ${tags}
+      </ol>
     </body>
     </html>`;
 
