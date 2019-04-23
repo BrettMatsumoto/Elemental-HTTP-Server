@@ -186,7 +186,7 @@ const server = http.createServer((req, res) => {
       fs.unlink(`./public/${parsedData.elementName}.html`, (err) => {
         if (err) throw err;
       });
-      if (!`./public/${parsedData.elementName}.html`) {
+      if (!(`./public/${parsedData.elementName}.html`)) {
         res.writeHead(500, {
           'Content-Type': 'application/json',
         });
