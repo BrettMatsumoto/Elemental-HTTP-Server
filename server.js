@@ -11,30 +11,37 @@ const server = http.createServer((req, res) => {
         if (err) {
           throw err;
         }
+
         return res.end(data);
       });
     }
+
     if (req.url === '/helium.html') {
       fs.readFile('./public/helium.html', 'utf8', (err, data) => {
         if (err) {
           throw err;
         }
+
         return res.end(data);
       });
     }
+
     if (req.url === '/hydrogen.html') {
       fs.readFile('./public/hydrogen.html', 'utf8', (err, data) => {
         if (err) {
           throw err;
         }
+
         return res.end(data);
       });
     }
+
     if (req.url === '/css/styles.css') {
       fs.readFile('./public/css/styles.css', 'utf8', (err, data) => {
         if (err) {
           throw err;
         }
+
         return res.end(data);
       });
     } else {
@@ -42,18 +49,23 @@ const server = http.createServer((req, res) => {
         if (err) {
           throw err;
         }
+
         return res.end(data);
       });
     }
   }
+
   if (req.method === 'POST') {
     if (req.url === '/elements') {
       let totalData = '';
+
       req.on('data', (data) => {
         totalData += data;
       });
+
       req.on('end', () => {
         const parsedData = qs.parse(totalData);
+
         const template = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -69,11 +81,13 @@ const server = http.createServer((req, res) => {
   <div>${parsedData.elementDescription}</div>
 </body>
 </html>`;
+
         fs.writeFile(`./public/${parsedData.elementName}.html`, template, 'utf8', (err) => {
           if (err) {
             throw err;
           }
         });
+
         fs.readdir('./public', (err, files) => {
           const knownFiles = files.filter(
             (file) => file !== '.keep' && file !== '.404' && file !== 'css' && file !== 'index.html',
@@ -82,6 +96,7 @@ const server = http.createServer((req, res) => {
           let lowerCase = '';
           let standardCase = '';
           let subString = '';
+
           for (let newElement = 0; newElement < knownFiles.length; newElement++) {
             lowerCase = knownFiles[newElement].toLowerCase();
             standardCase = knownFiles[newElement].charAt(0).toUpperCase() + knownFiles[newElement].slice(1);
@@ -92,6 +107,7 @@ const server = http.createServer((req, res) => {
             <li>
             `;
           }
+
           let reWrittenHTML = `
   <!DOCTYPE html>
     <html lang="en">
@@ -116,6 +132,7 @@ const server = http.createServer((req, res) => {
       ${tags}
     </body>
     </html>`;
+
           fs.writeFile(`public/index.html`, reWrittenHTML, 'utf8', (err) => {
             if (err) {
               return console.log(err);
@@ -123,17 +140,22 @@ const server = http.createServer((req, res) => {
           });
         });
       });
+
       res.writeHead(200, {
         'Content-Type': 'application/json',
       });
+
       res.end(`{"success" : true}`);
     }
   }
+
   if (req.method === 'PUT') {
     let totalData = '';
+
     req.on('data', (data) => {
       totalData += data;
     });
+
     req.on('end', () => {
       const parsedData = qs.parse(totalData);
 
@@ -141,10 +163,12 @@ const server = http.createServer((req, res) => {
         const knownFiles = files.filter(
           (file) => file !== '.keep' && file !== '.404' && file !== 'css' && file !== 'index.html',
         );
+
         if (!knownFiles.includes(`${parsedData.elementName}.html`)) {
           res.writeHead(500, {
             'Content-Type': 'application/json',
           });
+
           res.end(`{"error"} : ${parsedData.elementName}.html was not found.`);
         } else {
           const template = `<!DOCTYPE html>
@@ -162,39 +186,48 @@ const server = http.createServer((req, res) => {
   <div>${parsedData.elementDescription}</div>
 </body>
 </html>`;
+
           fs.writeFile(`./public/${parsedData.elementName}.html`, template, 'utf8', (err) => {
             if (err) {
               throw err;
             }
           });
+
           res.writeHead(200, {
             'Content-Type': 'application/json',
           });
+
           res.end(`{sucess} : true`);
         }
       });
     });
   }
+
   if (req.method === 'DELETE') {
     let totalData = '';
+
     req.on('data', (data) => {
       totalData += data;
     });
+
     req.on('end', () => {
       const parsedData = qs.parse(totalData);
 
       fs.unlink(`./public/${parsedData.elementName}.html`, (err) => {
         if (err) throw err;
       });
-      if (!(`./public/${parsedData.elementName}.html`)) {
+
+      if (!`./public/${parsedData.elementName}.html`) {
         res.writeHead(500, {
           'Content-Type': 'application/json',
         });
+
         res.end(`{"error" : resource ${parsedData.elementName} does not exist}`);
       } else {
         res.writeHead(200, {
           'Content-Type': 'application/json',
         });
+
         res.end(`{sucess} : true`);
       }
     });
